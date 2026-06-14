@@ -1,0 +1,6 @@
+@BowlingGameScoreboard_HostAddress = http://localhost:5010
+
+GET {{BowlingGameScoreboard_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
