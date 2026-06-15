@@ -2,65 +2,199 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Bowling API Tester</title>
+  <title>🎳 Bowling API Tester</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 900px;
+      margin: 40px auto;
+      background: #f7f7f7;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    button {
+      margin: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    textarea {
+      width: 100%;
+      font-family: monospace;
+    }
+
+    pre {
+      background: #111;
+      color: #0f0;
+      padding: 12px;
+      overflow: auto;
+    }
+  </style>
 </head>
 
-<body style="font-family: Arial; max-width: 700px; margin: 40px auto;">
-  <h2>🎳 Bowling API Tester</h2>
+<body>
 
-  <p>Payload (JSON):</p>
+<h2>🎳 Bowling API Tester</h2>
 
-  <textarea id="payload" rows="6" style="width: 100%; font-family: monospace;">
+<!-- TESTS -->
+<div class="card">
+  <h3>⚡ Valid cases</h3>
+
+  <button onclick="setPayload(perfectGame())">Perfect 300</button>
+  <button onclick="setPayload(allSpares())">All spares (150)</button>
+  <button onclick="setPayload(simpleGame())">Simple game</button>
+</div>
+
+<div class="card">
+  <h3>❌ Invalid cases</h3>
+
+  <button onclick="setPayload(invalidRoll())">Roll > 10</button>
+  <button onclick="setPayload(negativeRoll())">Negative roll</button>
+  <button onclick="setPayload(emptyBody())">Empty</button>
+  <button onclick="setPayload(invalidJson())">Broken JSON</button>
+  <button onclick="setPayload(nullRolls())">Null rolls</button>
+</div>
+
+<div class="card">
+  <h3>⚠️ Edge cases</h3>
+
+  <button onclick="setPayload(lateStrike())">Late strikes</button>
+  <button onclick="setPayload(lastSpare())">Last frame spare</button>
+  <button onclick="setPayload(extraRolls())">Extra rolls</button>
+</div>
+
+<!-- PAYLOAD -->
+<div class="card">
+  <h3>✏️ Payload</h3>
+
+  <textarea id="payload" rows="10">
 {
-  "rolls": [10, 0, 10, 0, 10, 0]
+  "rolls": [10, 0, 7, 3, 5, 2]
 }
   </textarea>
 
-  <br><br>
+  <button onclick="send()">🚀 Send request</button>
+  <button onclick="clearPayload()">🧹 Clear</button>
+</div>
 
-  <button onclick="sendRequest()">Enviar</button>
-  <button onclick="testInvalidJson()">JSON inválido</button>
-  <button onclick="testEmpty()">Vazio</button>
+<!-- RESPONSE -->
+<div class="card">
+  <h3>📊 Response</h3>
+  <pre id="output">waiting...</pre>
+</div>
 
-  <hr>
+<script>
+const API_URL = "https://bowling-game-scoreboard-967396131965.southamerica-east1.run.app/api/bowling/score";
 
-  <h3>Resposta</h3>
-  <pre id="output"></pre>
+/* =========================
+   VALID CASES
+========================= */
 
-  <script>
-    const API_URL = "https://bowling-game-scoreboard-967396131965.southamerica-east1.run.app/api/bowling/score";
+function perfectGame() {
+  return JSON.stringify({ rolls: Array(12).fill(10) }, null, 2);
+}
 
-    async function sendRequest(bodyOverride) {
-      const output = document.getElementById("output");
+function allSpares() {
+  return JSON.stringify({ rolls: Array(21).fill(5) }, null, 2);
+}
 
-      try {
-        const bodyText = bodyOverride || document.getElementById("payload").value;
+function simpleGame() {
+  return JSON.stringify({ rolls: [1,2,3,4,5,4,3,2,1,0] }, null, 2);
+}
 
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: bodyText
-        });
+/* =========================
+   INVALID CASES
+========================= */
 
-        const text = await res.text();
+function invalidRoll() {
+  return JSON.stringify({ rolls: [11,0,5,2] }, null, 2);
+}
 
-        output.textContent =
-          "STATUS: " + res.status + "\n\n" + text;
+function negativeRoll() {
+  return JSON.stringify({ rolls: [-1,5,3] }, null, 2);
+}
 
-      } catch (err) {
-        output.textContent = "ERRO DE REDE:\n" + err.message;
-      }
-    }
+function nullRolls() {
+  return JSON.stringify({ rolls: null }, null, 2);
+}
 
-    function testInvalidJson() {
-      sendRequest("{ rolls: [10, 0, ] }"); // JSON quebrado
-    }
+function invalidJson() {
+  return "{ rolls: [10, ] }";
+}
 
-    function testEmpty() {
-      sendRequest(""); // body vazio
-    }
-  </script>
+function emptyBody() {
+  return "";
+}
+
+/* =========================
+   EDGE CASES
+========================= */
+
+function lateStrike() {
+  return JSON.stringify({
+    rolls: [0,0,0,0,0,0,0,0,0,0,10,10]
+  }, null, 2);
+}
+
+function lastSpare() {
+  return JSON.stringify({
+    rolls: [0,0,0,0,0,0,0,0,0,7,3,5]
+  }, null, 2);
+}
+
+function extraRolls() {
+  return JSON.stringify({
+    rolls: Array(20).fill(10)
+  }, null, 2);
+}
+
+/* =========================
+   UI HELPERS
+========================= */
+
+function setPayload(value) {
+  document.getElementById("payload").value = value;
+}
+
+function clearPayload() {
+  document.getElementById("payload").value = "";
+}
+
+/* =========================
+   API CALL
+========================= */
+
+async function send() {
+  const output = document.getElementById("output");
+  const payload = document.getElementById("payload").value;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: payload
+    });
+
+    const text = await res.text();
+
+    output.textContent =
+      "STATUS: " + res.status + "\n\n" + text;
+
+  } catch (err) {
+    output.textContent = "ERROR: " + err.message;
+  }
+}
+</script>
+
 </body>
 </html>

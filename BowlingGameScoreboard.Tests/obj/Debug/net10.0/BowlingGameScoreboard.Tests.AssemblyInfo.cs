@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BowlingGameScoreboard.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+82427c7fc9cad6ceb2c09e2e9c36f0fa5b4ddf37")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46f08073c566eaaddc0cdcade940265fd9552823")]
 [assembly: System.Reflection.AssemblyProductAttribute("BowlingGameScoreboard.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BowlingGameScoreboard.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
