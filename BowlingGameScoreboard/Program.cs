@@ -9,14 +9,8 @@ builder.Services.AddScoped<BowlingService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-// NÃO usar no Cloud Run
-// app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapPost("/api/bowling/score", (ScoreRequest request, BowlingService service) =>
 {
