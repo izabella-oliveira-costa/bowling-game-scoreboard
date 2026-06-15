@@ -16,14 +16,15 @@ public class BowlingController : ControllerBase
     }
 
     [HttpPost("score")]
-    public ActionResult<ScoreResponse> Calculate(
-        ScoreRequest request)
+    public ActionResult<ApiResponse<object>> Calculate(ScoreRequest request)
     {
         var score = _service.Calculate(request.Rolls);
 
-        return Ok(new ScoreResponse
+        return Ok(new ApiResponse<object>
         {
-            Score = score
+            Success = true,
+            Message = "Score calculated successfully",
+            Data = new { score }
         });
     }
 }

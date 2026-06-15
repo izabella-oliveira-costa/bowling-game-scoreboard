@@ -1,34 +1,64 @@
-using BowlingGameScoreboard.Models;
 using BowlingGameScoreboard.Services;
+using BowlingGameScoreboard.Models;
+using BowlingGameScoreboard.Domain.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
+builder.Services.AddScoped<BowlingService>();
 
 builder.Services.AddCors();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<BowlingService>();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+// Swagger (idealmente só em dev)
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
+// CORS
 app.UseCors(policy =>
-    policy
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
+    policy.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader()
 );
 
-app.MapPost("/api/bowling/score", (ScoreRequest request, BowlingService service) =>
+// Exception handling global
+app.UseExceptionHandler(appError =>
 {
-    var score = service.Calculate(request.Rolls);
+    appError.Run(async context =>
+    {
+        context.Response.ContentType = "application/json";
 
-    return Results.Ok(new ScoreResponse { Score = score });
+        var exception = context.Features
+            .Get<IExceptionHandlerFeature>()?
+            .Error;
+
+        context.Response.StatusCode = exception switch
+        {
+            InvalidRollException => 400,
+            InvalidGameException => 422,
+            _ => 500
+        };
+
+        var message = exception?.Message ?? "Unexpected server error";
+
+        await context.Response.WriteAsJsonAsync(new ApiResponse<object>
+        {
+            Success = false,
+            Message = message,
+            Data = null
+        });
+    });
 });
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-app.Urls.Add($"http://0.0.0.0:{port}");
+app.MapControllers();
 
 app.Run();
