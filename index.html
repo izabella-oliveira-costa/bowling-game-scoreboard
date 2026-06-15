@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Bowling API Tester</title>
+</head>
+
+<body style="font-family: Arial; max-width: 700px; margin: 40px auto;">
+  <h2>🎳 Bowling API Tester</h2>
+
+  <p>Payload (JSON):</p>
+
+  <textarea id="payload" rows="6" style="width: 100%; font-family: monospace;">
+{
+  "rolls": [10, 0, 10, 0, 10, 0]
+}
+  </textarea>
+
+  <br><br>
+
+  <button onclick="sendRequest()">Enviar</button>
+  <button onclick="testInvalidJson()">JSON inválido</button>
+  <button onclick="testEmpty()">Vazio</button>
+
+  <hr>
+
+  <h3>Resposta</h3>
+  <pre id="output"></pre>
+
+  <script>
+    const API_URL = "https://bowling-game-scoreboard-967396131965.southamerica-east1.run.app/api/bowling/score";
+
+    async function sendRequest(bodyOverride) {
+      const output = document.getElementById("output");
+
+      try {
+        const bodyText = bodyOverride || document.getElementById("payload").value;
+
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: bodyText
+        });
+
+        const text = await res.text();
+
+        output.textContent =
+          "STATUS: " + res.status + "\n\n" + text;
+
+      } catch (err) {
+        output.textContent = "ERRO DE REDE:\n" + err.message;
+      }
+    }
+
+    function testInvalidJson() {
+      sendRequest("{ rolls: [10, 0, ] }"); // JSON quebrado
+    }
+
+    function testEmpty() {
+      sendRequest(""); // body vazio
+    }
+  </script>
+</body>
+</html>
