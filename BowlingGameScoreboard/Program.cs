@@ -9,25 +9,23 @@ builder.Services.AddScoped<BowlingService>();
 
 var app = builder.Build();
 
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// NÃO usar no Cloud Run
+// app.UseHttpsRedirection();
 
-app.MapPost("/api/bowling/score",
-    (ScoreRequest request, BowlingService service) =>
-    {
-        var score = service.Calculate(request.Rolls);
+app.MapPost("/api/bowling/score", (ScoreRequest request, BowlingService service) =>
+{
+    var score = service.Calculate(request.Rolls);
 
-        return Results.Ok(
-            new ScoreResponse
-            {
-                Score = score
-            });
-    });
+    return Results.Ok(new ScoreResponse { Score = score });
+});
+
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+app.Urls.Add($"http://0.0.0.0:{port}");
 
 app.Run();
