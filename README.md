@@ -27,6 +27,8 @@ bowling-game-scoreboard
 ├── BowlingGameScoreboard
 │   ├── Models
 │   ├── Services
+│   ├── Controllers
+│   ├── Domain
 │   ├── Program.cs
 │   └── BowlingGameScoreboard.csproj
 │
@@ -48,13 +50,13 @@ dotnet run --project BowlingGameScoreboard
 The API will be available at:
 
 ```text
-http://localhost:5000
+http://localhost:5010
 ```
 
 Swagger documentation:
 
 ```text
-http://localhost:5000/swagger
+http://localhost:5010/swagger
 ```
 
 ## Running Tests
@@ -70,7 +72,7 @@ dotnet test BowlingGameScoreboard.Tests
 **POST**
 
 ```text
-/api/bowling/score
+/api/Bowling/score
 ```
 
 ### Request
@@ -94,9 +96,41 @@ dotnet test BowlingGameScoreboard.Tests
 
 ### Response
 
+200 - OK
 ```json
 {
-  "score": 133
+  "success": true,
+  "message": "Score calculated successfully",
+  "data": {
+    "score": 133
+  }
+}
+```
+400 - Bad Request - Thrown when individual entries break value boundary conditions (e.g., negative pins or a single roll knocking down more than 10 pins).
+
+```json
+{
+  "success": false,
+  "message": "Roll must be between 0 and 10.",
+  "data": null
+}
+```
+422 - Unprocessable Entity - Thrown when the array sequence violates bowling game rules (e.g., an incomplete match, frame total exceeding 10 pins, or wrong amount of bonus rolls in the 10th frame).
+
+```json
+{
+  "success": false,
+  "message": "Frame cannot exceed 10 pins.",
+  "data": null
+}
+```
+
+500 - Server Error
+```json
+{
+  "success": false,
+  "message": "Unexpected server error",
+  "data": null
 }
 ```
 
@@ -128,6 +162,8 @@ docker run -p 8080:8080 bowling-game-scoreboard
 ## Deployment
 
 The backend is designed to run on Google Cloud Run and can be consumed by a lightweight frontend hosted on Firebase Hosting.
+
+Live UI Web App: https://bowling-game-scoreboard.web.app/
 
 ## Author
 

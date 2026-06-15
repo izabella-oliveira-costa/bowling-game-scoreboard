@@ -16,21 +16,15 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger (idealmente só em dev)
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-// CORS
 app.UseCors(policy =>
     policy.AllowAnyOrigin()
            .AllowAnyMethod()
            .AllowAnyHeader()
 );
 
-// Exception handling global
 app.UseExceptionHandler(appError =>
 {
     appError.Run(async context =>

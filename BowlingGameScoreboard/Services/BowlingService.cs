@@ -58,7 +58,7 @@ public class BowlingService
             if (rollIndex >= rolls.Count)
                 throw new InvalidGameException("Incomplete game.");
 
-            if (rolls[rollIndex] == 10) // Strike
+            if (rolls[rollIndex] == 10)
             {
                 rollIndex++;
             }
@@ -89,7 +89,7 @@ public class BowlingService
             if (ball2 != 10 && (ball2 + ball3 > 10))
                 throw new InvalidGameException("Invalid bonus rolls in 10th frame.");
         }
-        else if (ball1 + ball2 == 10) // Fez Spare no 10º
+        else if (ball1 + ball2 == 10)
         {
             if (rollIndex + 2 != rolls.Count - 1)
                 throw new InvalidGameException("10th frame spare requires exactly 1 bonus roll.");
